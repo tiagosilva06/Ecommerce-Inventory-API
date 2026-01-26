@@ -1,6 +1,6 @@
-package com.project.ecommerce.inventory.infraestructure.entities;
+package com.project.ecommerce.inventory.entity;
 
-import com.project.ecommerce.inventory.dto.ProductDto;
+import com.project.ecommerce.inventory.dto.ProductCreateDto;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,7 +33,7 @@ public class Product {
     @Column(name = "is_active")
     private Boolean isActive;
 
-    public Product (ProductDto dto){
+    public Product (ProductCreateDto dto){
         this.productName = dto.productName();
         this.color = dto.color();
         this.size = dto.size();
