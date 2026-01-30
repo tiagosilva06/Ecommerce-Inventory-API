@@ -4,13 +4,12 @@ import com.project.ecommerce.inventory.dto.ProductCreateDto;
 import com.project.ecommerce.inventory.dto.ProductUpdateDto;
 import com.project.ecommerce.inventory.entity.Product;
 import com.project.ecommerce.inventory.repository.ProductRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -20,10 +19,10 @@ public class ProductService {
     private final ProductRepository repository;
 
     @Transactional
-    public void saveProduct (ProductCreateDto dto){
+    public Product saveProduct (ProductCreateDto dto){
         Product product = new Product(dto);
 
-        repository.save(product);
+        return repository.save(product);
     }
 
     public Page<Product> getAllProducts (Pageable page){
@@ -34,14 +33,16 @@ public class ProductService {
         return repository.findByProductNameContainingIgnoreCaseAndIsActiveTrue(productName, page);
     }
 
-    public Optional<Product> getProductsById(Long id){
-        return repository.findById(id);
+    public Product getProductsById(Long id){
+        return repository.findById(id).
+                orElseThrow(() -> new EntityNotFoundException("Product Not Found"));
     }
 
     @Transactional
-    public void updateProduct(ProductUpdateDto data){
+    public Product updateProduct(ProductUpdateDto data){
         var product = repository.getReferenceById(data.id());
         product.updateProduct(data);
+        return product;
     }
 
     @Transactional

@@ -44,11 +44,10 @@ public class Product {
     }
 
     public void updateProduct(ProductUpdateDto dto){
-        if (dto.id() != null) { this.id = dto.id(); }
         if (dto.productName() != null) { this.productName = dto.productName(); }
         if (dto.color() != null) { this.color = dto.color(); }
         if (dto.size() != null) { this.size = dto.size(); }
-        if (dto.quantity() != 0) { this.quantity = dto.quantity(); }
+        this.quantity = dto.quantity();
         if (dto.price() != null) { this.price = dto.price(); }
     }
 

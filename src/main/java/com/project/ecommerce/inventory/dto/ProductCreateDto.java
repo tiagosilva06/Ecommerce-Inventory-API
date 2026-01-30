@@ -1,5 +1,6 @@
 package com.project.ecommerce.inventory.dto;
 
+import com.project.ecommerce.inventory.entity.Product;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
