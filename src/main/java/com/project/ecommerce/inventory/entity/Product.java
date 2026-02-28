@@ -4,8 +4,11 @@ import com.project.ecommerce.inventory.dto.ProductCreateDto;
 import com.project.ecommerce.inventory.dto.ProductUpdateDto;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -20,6 +23,9 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<InventoryMovement> movements = new ArrayList<>();
 
     @Column(name = "product_name")
     private String productName;
