@@ -2,6 +2,7 @@ package com.project.ecommerce.inventory.entity;
 
 import com.project.ecommerce.inventory.dto.ProductCreateDto;
 import com.project.ecommerce.inventory.dto.ProductUpdateDto;
+import com.project.ecommerce.inventory.exception.InsufficientInventoryException;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +60,18 @@ public class Product {
 
     public void deleteProduct(){
         this.isActive = false;
+    }
+
+    public void increaseInventory(int quantity){
+        this.quantity += quantity;
+    }
+
+    public void decreaseInventory(int quantity){
+        if(this.quantity < quantity){
+            throw new InsufficientInventoryException(this.id, this.getQuantity(), quantity);
+        }
+
+        this.quantity -= quantity;
     }
 
 }

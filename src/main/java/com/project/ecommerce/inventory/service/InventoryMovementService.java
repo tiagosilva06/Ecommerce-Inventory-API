@@ -1,9 +1,9 @@
 package com.project.ecommerce.inventory.service;
 
-import com.project.ecommerce.inventory.dto.InventoryMovementRequestDto;
 import com.project.ecommerce.inventory.entity.InventoryMovement;
 import com.project.ecommerce.inventory.entity.MovementType;
 import com.project.ecommerce.inventory.entity.Product;
+import com.project.ecommerce.inventory.exception.ProductNotFoundException;
 import com.project.ecommerce.inventory.repository.InventoryMovementRepository;
 import com.project.ecommerce.inventory.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +20,12 @@ public class InventoryMovementService {
     private InventoryMovementRepository inventoryRepository;
 
     @Transactional
-    public void entry( Long productId, int quantity){
+    public void entry (Long productId, int quantity){
 
        Product product = productRepository.findById(productId).
-               orElseThrow(() -> new RuntimeException("Product Not Found"));
+               orElseThrow(() -> new ProductNotFoundException(productId));
 
-       product.setQuantity(product.getQuantity() + quantity);
+       product.increaseInventory(quantity);
 
        InventoryMovement movement = InventoryMovement.builder()
                .product(product)
@@ -34,5 +34,23 @@ public class InventoryMovementService {
                .build();
 
        inventoryRepository.save(movement);
+    }
+
+    @Transactional
+    public void exit (Long productId, int quantity){
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException(productId));
+
+        product.decreaseInventory(quantity);
+
+        InventoryMovement movement = InventoryMovement.builder()
+                .product(product)
+                .type(MovementType.EXIT)
+                .quantity(quantity)
+                .build();
+
+        inventoryRepository.save(movement);
+
     }
 }
