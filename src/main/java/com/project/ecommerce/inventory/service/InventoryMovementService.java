@@ -1,9 +1,14 @@
 package com.project.ecommerce.inventory.service;
 
+import com.project.ecommerce.inventory.dto.InventoryMovementRequestDto;
+import com.project.ecommerce.inventory.entity.InventoryMovement;
+import com.project.ecommerce.inventory.entity.MovementType;
+import com.project.ecommerce.inventory.entity.Product;
 import com.project.ecommerce.inventory.repository.InventoryMovementRepository;
 import com.project.ecommerce.inventory.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class InventoryMovementService {
@@ -14,5 +19,20 @@ public class InventoryMovementService {
     @Autowired
     private InventoryMovementRepository inventoryRepository;
 
+    @Transactional
+    public void entry( Long productId, int quantity){
 
+       Product product = productRepository.findById(productId).
+               orElseThrow(() -> new RuntimeException("Product Not Found"));
+
+       product.setQuantity(product.getQuantity() + quantity);
+
+       InventoryMovement movement = InventoryMovement.builder()
+               .product(product)
+               .type(MovementType.ENTRY)
+               .quantity(quantity)
+               .build();
+
+       inventoryRepository.save(movement);
+    }
 }
