@@ -20,7 +20,7 @@ public class InventoryMovementService {
     private InventoryMovementRepository inventoryRepository;
 
     @Transactional
-    public void entry (Long productId, int quantity){
+    public Product entry (Long productId, int quantity){
 
        Product product = productRepository.findById(productId).
                orElseThrow(() -> new ProductNotFoundException(productId));
@@ -34,10 +34,11 @@ public class InventoryMovementService {
                .build();
 
        inventoryRepository.save(movement);
+       return product;
     }
 
     @Transactional
-    public void exit (Long productId, int quantity){
+    public Product exit (Long productId, int quantity){
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException(productId));
@@ -51,6 +52,6 @@ public class InventoryMovementService {
                 .build();
 
         inventoryRepository.save(movement);
-
+        return product;
     }
 }
