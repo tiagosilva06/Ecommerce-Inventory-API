@@ -3,9 +3,9 @@ package com.project.ecommerce.inventory.entity;
 import com.project.ecommerce.inventory.dto.ProductCreateDto;
 import com.project.ecommerce.inventory.dto.ProductUpdateDto;
 import com.project.ecommerce.inventory.exception.InsufficientInventoryException;
+import com.project.ecommerce.inventory.exception.InvalidQuantityException;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -63,7 +63,12 @@ public class Product {
     }
 
     public void increaseInventory(int quantity){
-        this.quantity += quantity;
+
+            if(quantity <= 0) {
+                throw new InvalidQuantityException("Quantity must be greater than zero");
+            }
+
+            this.quantity += quantity;
     }
 
     public void decreaseInventory(int quantity){
