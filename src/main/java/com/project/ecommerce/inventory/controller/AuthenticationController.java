@@ -1,7 +1,7 @@
 package com.project.ecommerce.inventory.controller;
 
 import com.project.ecommerce.inventory.dto.AuthenticationDataDto;
-import com.project.ecommerce.inventory.dto.tokenJWTData;
+import com.project.ecommerce.inventory.dto.TokenJWTDataDto;
 import com.project.ecommerce.inventory.entity.User;
 import com.project.ecommerce.inventory.service.TokenService;
 import jakarta.validation.Valid;
@@ -25,13 +25,13 @@ public class AuthenticationController {
     private TokenService tokenService;
 
     @PostMapping
-    public ResponseEntity<tokenJWTData> login (@RequestBody @Valid AuthenticationDataDto dto){
+    public ResponseEntity<TokenJWTDataDto> login (@RequestBody @Valid AuthenticationDataDto dto){
 
         var token = new UsernamePasswordAuthenticationToken(dto.login(), dto.password());
         var authentication = manager.authenticate(token);
 
         var tokenJWT = tokenService.generateToken((User) authentication.getPrincipal());
 
-        return ResponseEntity.ok(new tokenJWTData(tokenJWT));
+        return ResponseEntity.ok(new TokenJWTDataDto(tokenJWT));
     }
 }

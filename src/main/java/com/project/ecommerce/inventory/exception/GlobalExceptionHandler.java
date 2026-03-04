@@ -1,29 +1,47 @@
 package com.project.ecommerce.inventory.exception;
 
+import com.project.ecommerce.inventory.dto.ErrorResponse;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.util.List;
+import java.time.LocalDateTime;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    //Tratamento do erro 404
+    //Handling Error 404
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<Void> handleNotFound(){
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<ErrorResponse> handleNotFound(EntityNotFoundException exception){
+
+        ErrorResponse error = new ErrorResponse(404, exception.getMessage(), LocalDateTime.now().toString());
+
+        return ResponseEntity.status(404).body(error);
     }
 
-    //Tratamento erro 400
+    //Handling Error 400
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<List<errorDataValidation>> handleBadRequest(MethodArgumentNotValidException exception){
-        var errors = exception.getFieldErrors();
+    public ResponseEntity<ErrorResponse> handleBadRequest(MethodArgumentNotValidException exception){
 
-        return ResponseEntity.badRequest().body(errors.stream().map(errorDataValidation::new).toList());
+        var errors = exception.getFieldErrors()
+                .stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+            .toList();
+
+        ErrorResponse error = new ErrorResponse(400, errors.toString(), LocalDateTime.now().toString());
+
+        return ResponseEntity.badRequest().body(error);
+    }
+
+    //Handling Invalid Quantity
+    @ExceptionHandler (InvalidQuantityException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidQuantity (InvalidQuantityException exception){
+
+        ErrorResponse error = new ErrorResponse(400, exception.getMessage(), LocalDateTime.now().toString());
+
+        return ResponseEntity.badRequest().body(error);
     }
 
     public record errorDataValidation(String field, String message){

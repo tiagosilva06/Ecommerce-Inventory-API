@@ -1,4 +1,4 @@
 package com.project.ecommerce.inventory.dto;
 
-public record tokenJWTData(String token) {
+public record TokenJWTDataDto(String token) {
 }
