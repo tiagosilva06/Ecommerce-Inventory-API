@@ -3,6 +3,7 @@ package com.project.ecommerce.inventory.service;
 import com.project.ecommerce.inventory.dto.ProductCreateDto;
 import com.project.ecommerce.inventory.dto.ProductUpdateDto;
 import com.project.ecommerce.inventory.entity.Product;
+import com.project.ecommerce.inventory.exception.ResourceNotFoundException;
 import com.project.ecommerce.inventory.repository.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +36,7 @@ public class ProductService {
 
     public Product getProductsById(Long id){
         return repository.findById(id).
-                orElseThrow(() -> new EntityNotFoundException("Product Not Found"));
+                orElseThrow(() -> new ResourceNotFoundException("Product Not Found"));
     }
 
     @Transactional

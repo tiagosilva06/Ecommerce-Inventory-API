@@ -1,7 +1,6 @@
 package com.project.ecommerce.inventory.exception;
 
 import com.project.ecommerce.inventory.dto.ErrorResponse;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -13,10 +12,10 @@ import java.time.LocalDateTime;
 public class GlobalExceptionHandler {
 
     //Handling Error 404
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleNotFound(EntityNotFoundException exception){
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFound(ResourceNotFoundException exception){
 
-        ErrorResponse error = new ErrorResponse(404, exception.getMessage(), LocalDateTime.now().toString());
+        ErrorResponse error = new ErrorResponse(404, exception.getMessage(), LocalDateTime.now());
 
         return ResponseEntity.status(404).body(error);
     }
@@ -30,7 +29,7 @@ public class GlobalExceptionHandler {
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
             .toList();
 
-        ErrorResponse error = new ErrorResponse(400, errors.toString(), LocalDateTime.now().toString());
+        ErrorResponse error = new ErrorResponse(400, errors.toString(), LocalDateTime.now());
 
         return ResponseEntity.badRequest().body(error);
     }
@@ -39,7 +38,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler (InvalidQuantityException.class)
     public ResponseEntity<ErrorResponse> handleInvalidQuantity (InvalidQuantityException exception){
 
-        ErrorResponse error = new ErrorResponse(400, exception.getMessage(), LocalDateTime.now().toString());
+        ErrorResponse error = new ErrorResponse(400, exception.getMessage(), LocalDateTime.now());
 
         return ResponseEntity.badRequest().body(error);
     }
