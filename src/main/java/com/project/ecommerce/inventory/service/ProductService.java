@@ -3,15 +3,13 @@ package com.project.ecommerce.inventory.service;
 import com.project.ecommerce.inventory.dto.ProductCreateDto;
 import com.project.ecommerce.inventory.dto.ProductUpdateDto;
 import com.project.ecommerce.inventory.entity.Product;
-import com.project.ecommerce.inventory.exception.ResourceNotFoundException;
+import com.project.ecommerce.inventory.exception.ProductNotFoundException;
 import com.project.ecommerce.inventory.repository.ProductRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -34,9 +32,9 @@ public class ProductService {
         return repository.findByProductNameContainingIgnoreCaseAndIsActiveTrue(productName, page);
     }
 
-    public Product getProductsById(Long id){
-        return repository.findById(id).
-                orElseThrow(() -> new ResourceNotFoundException("Product Not Found"));
+    public Product getProductsById(Long productId){
+        return repository.findById(productId).
+                orElseThrow(() -> new ProductNotFoundException(productId));
     }
 
     @Transactional

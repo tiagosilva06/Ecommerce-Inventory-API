@@ -72,8 +72,13 @@ public class Product {
     }
 
     public void decreaseInventory(int quantity){
+
         if(this.quantity < quantity){
             throw new InsufficientInventoryException(this.id, this.getQuantity(), quantity);
+        }
+
+        if(quantity <= 0){
+            throw new InvalidQuantityException("Quantity must be greater than zero");
         }
 
         this.quantity -= quantity;

@@ -6,7 +6,7 @@ public class InsufficientInventoryException extends RuntimeException {
 
         super("Insufficient inventory for product id: " + productId +
                 ". Available: " + available +
-                ".Requested: " + requested
+                ". Requested: " + requested
         );
     }
 }
