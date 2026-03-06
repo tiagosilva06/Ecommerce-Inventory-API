@@ -1,6 +1,5 @@
 package com.project.ecommerce.inventory.exception;
 
-import com.project.ecommerce.inventory.dto.ErrorResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
