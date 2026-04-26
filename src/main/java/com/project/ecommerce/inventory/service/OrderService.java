@@ -12,6 +12,7 @@ import com.project.ecommerce.inventory.repository.OrderRepository;
 import com.project.ecommerce.inventory.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -25,6 +26,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
 
+    @Transactional
     public Order createOrder(OrderRequestDto request){
         Order order = new Order();
         order.setCustomerName(request.customerName());
