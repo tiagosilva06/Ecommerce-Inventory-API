@@ -6,6 +6,8 @@ import com.project.ecommerce.inventory.entity.Order;
 import com.project.ecommerce.inventory.entity.OrderItem;
 import com.project.ecommerce.inventory.entity.OrderStatus;
 import com.project.ecommerce.inventory.entity.Product;
+import com.project.ecommerce.inventory.exception.InsufficientInventoryException;
+import com.project.ecommerce.inventory.exception.ProductNotFoundException;
 import com.project.ecommerce.inventory.repository.OrderRepository;
 import com.project.ecommerce.inventory.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,9 +37,13 @@ public class OrderService {
         for(OrderItemRequestDto itemRequest : request.items()){
 
             Product product = productRepository.findById(itemRequest.productId())
-                    .orElseThrow(() -> new RuntimeException("Product not found"));
+                    .orElseThrow(() -> new ProductNotFoundException(itemRequest.productId()));
 
-            // ⚠️ Ainda sem validação de estoque
+            if(product.getQuantity() < itemRequest.quantity()){
+                throw new InsufficientInventoryException(product.getId(), product.getQuantity(), itemRequest.quantity());
+            }
+
+            product.setQuantity(product.getQuantity() - itemRequest.quantity());
 
             OrderItem orderItem = new OrderItem();
             orderItem.setProduct(product);
