@@ -1,11 +1,20 @@
 package com.project.ecommerce.inventory.service;
 
+import com.project.ecommerce.inventory.dto.OrderItemRequestDto;
 import com.project.ecommerce.inventory.dto.OrderRequestDto;
 import com.project.ecommerce.inventory.entity.Order;
+import com.project.ecommerce.inventory.entity.OrderItem;
+import com.project.ecommerce.inventory.entity.OrderStatus;
+import com.project.ecommerce.inventory.entity.Product;
 import com.project.ecommerce.inventory.repository.OrderRepository;
 import com.project.ecommerce.inventory.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -15,8 +24,39 @@ public class OrderService {
     private final ProductRepository productRepository;
 
     public Order createOrder(OrderRequestDto request){
+        Order order = new Order();
+        order.setCustomerName(request.customerName());
+        order.setOrderDate(LocalDateTime.now());
+        order.setStatus(OrderStatus.CREATED);
 
-        return null;
+        List<OrderItem> items = new ArrayList<>();
+        BigDecimal totalAmount = BigDecimal.ZERO;
+
+        for(OrderItemRequestDto itemRequest : request.items()){
+
+            Product product = productRepository.findById(itemRequest.productId())
+                    .orElseThrow(() -> new RuntimeException("Product not found"));
+
+            // ⚠️ Ainda sem validação de estoque
+
+            OrderItem orderItem = new OrderItem();
+            orderItem.setProduct(product);
+            orderItem.setQuantity(itemRequest.quantity());
+            orderItem.setPrice(product.getPrice());
+            orderItem.setOrder(order);
+
+            BigDecimal itemTotal = product.getPrice()
+                    .multiply(BigDecimal.valueOf(itemRequest.quantity()));
+
+            totalAmount = totalAmount.add(itemTotal);
+
+            items.add(orderItem);
+
+        }
+        order.setItems(items);
+        order.setTotalAmount(totalAmount);
+
+        return orderRepository.save(order);
     }
 
 }
