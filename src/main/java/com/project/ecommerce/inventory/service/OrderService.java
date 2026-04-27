@@ -7,6 +7,7 @@ import com.project.ecommerce.inventory.entity.OrderItem;
 import com.project.ecommerce.inventory.entity.OrderStatus;
 import com.project.ecommerce.inventory.entity.Product;
 import com.project.ecommerce.inventory.exception.InsufficientInventoryException;
+import com.project.ecommerce.inventory.exception.OrderNotFoundException;
 import com.project.ecommerce.inventory.exception.ProductNotFoundException;
 import com.project.ecommerce.inventory.repository.OrderRepository;
 import com.project.ecommerce.inventory.repository.ProductRepository;
@@ -17,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -70,5 +70,10 @@ public class OrderService {
 
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
+    }
+
+    public Order getOrderById(Long id) {
+        return orderRepository.findById(id)
+                .orElseThrow(() -> new OrderNotFoundException(id));
     }
 }
