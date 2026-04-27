@@ -67,4 +67,16 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(400).body(error);
     }
+
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleOrderNotFound(OrderNotFoundException exception) {
+
+        ErrorResponse error = new ErrorResponse(
+                404,
+                exception.getMessage(),
+                LocalDateTime.now()
+        );
+
+        return ResponseEntity.status(404).body(error);
+    }
 }
