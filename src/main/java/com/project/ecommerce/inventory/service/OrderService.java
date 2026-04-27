@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -67,4 +68,7 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
+    public List<Order> getAllOrders() {
+        return orderRepository.findAll();
+    }
 }
