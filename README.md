@@ -1,258 +1,280 @@
 # 📦 Ecommerce Inventory API
 
-API REST para **gerenciamento de estoque de um e-commerce**, desenvolvida com **Java e Spring Boot**.  
-O sistema permite cadastrar produtos, controlar entradas e saídas de estoque e registrar todas as movimentações realizadas.
+API REST desenvolvida em **Java com Spring Boot** para gestão completa de estoque e pedidos em um cenário de e-commerce real.
 
-O objetivo do projeto é simular um **sistema real utilizado por lojas online**, aplicando boas práticas de desenvolvimento backend como **arquitetura em camadas, separação de responsabilidades, autenticação com JWT e versionamento de banco de dados**.
-
----
-
-# 🎯 Objetivo do Projeto
-
-Este projeto foi desenvolvido como **projeto de portfólio backend**, com o objetivo de demonstrar habilidades em:
-
-- desenvolvimento de **APIs REST**
-- modelagem de **regras de negócio**
-- controle de **estoque**
-- implementação de **segurança com JWT**
-- utilização de **Spring Boot e Spring Data JPA**
-- organização de código seguindo **boas práticas de arquitetura**
-
-A aplicação simula um cenário real onde um e-commerce precisa controlar seu estoque e manter registro de todas as movimentações realizadas.
+O sistema integra produtos, movimentações de estoque e pedidos com controle automático de quantidade, autenticação JWT e containerização com Docker.
 
 ---
 
-# ⚙️ Funcionalidades
+## 🚀 Tecnologias
 
-### 📦 Gestão de Produtos
-- criação de novos produtos
-- atualização de informações do produto
-- busca por produto por ID
-- busca de produtos por nome
-- listagem paginada de produtos
-- desativação de produtos (soft delete)
-
-### 📊 Controle de Estoque
-O sistema permite registrar dois tipos de movimentação:
-
-**Entrada (ENTRY)**  
-Adiciona quantidade ao estoque de um produto.
-
-**Saída (EXIT)**  
-Remove quantidade do estoque de um produto.
-
-Todas as movimentações são registradas em uma tabela específica para manter **histórico completo do estoque**.
-
-### 📜 Histórico de Movimentações
-Cada alteração de estoque gera um registro contendo:
-
-- produto relacionado
-- tipo de movimentação
-- quantidade movimentada
-- data da operação
-
-Isso permite rastrear completamente as alterações no estoque.
-
-### 🔐 Autenticação e Segurança
-A API utiliza **JWT (JSON Web Token)** para autenticação.
-
-Fluxo de autenticação:
-
-1. usuário realiza login
-2. a API gera um **token JWT**
-3. o cliente utiliza o token para acessar rotas protegidas
-
-Essa abordagem permite um sistema **stateless**, amplamente utilizado em APIs modernas.
+| Tecnologia | Versão | Uso |
+|---|---|---|
+| Java | 17 | Linguagem principal |
+| Spring Boot | 3.x | Framework base |
+| Spring Security | 6.x | Autenticação e autorização |
+| Spring Data JPA | 3.x | Persistência de dados |
+| MySQL | 8 | Banco de dados relacional |
+| Flyway | - | Migrations de banco |
+| Docker & Docker Compose | - | Containerização |
+| JWT (auth0) | - | Tokens de autenticação |
+| BCrypt | - | Hash de senhas |
+| JUnit + Mockito | - | Testes unitários |
 
 ---
 
-# 🧱 Arquitetura da Aplicação
+## 🧠 Arquitetura
 
-O projeto segue o padrão de **arquitetura em camadas**, comum em aplicações Spring Boot.
+O projeto segue arquitetura em camadas com separação clara de responsabilidades:
 
-Camadas da aplicação:
-
-**Controller**  
-Responsável por receber as requisições HTTP e retornar respostas ao cliente.
-
-**Service**  
-Contém as regras de negócio da aplicação.
-
-**Repository**  
-Responsável pelo acesso ao banco de dados utilizando Spring Data JPA.
-
-**Entity**  
-Representação das tabelas do banco de dados.
-
-Essa separação facilita:
-
-- manutenção do código
-- escalabilidade
-- organização do projeto
-- testes unitários
+```
+src/
+├── controller/       → Entrada HTTP, validação de request
+├── service/          → Regras de negócio
+├── repository/       → Acesso a dados (Spring Data JPA)
+├── entity/           → Modelagem do domínio
+├── dto/              → Objetos de transferência de dados
+├── config/
+│   └── security/     → Configuração do Spring Security + Filtro JWT
+└── migrations/       → Scripts Flyway
+```
 
 ---
 
-# 🛠 Tecnologias Utilizadas
+## 🔐 Segurança
 
-## Backend
-
-- Java 17
-- Spring Boot
-- Spring Security
-- Spring Data JPA
-- Hibernate
-- JWT (Auth0)
-- Lombok
-
-## Banco de Dados
-
-- MySQL
-- Flyway (migrations de banco)
+- Autenticação via **JWT (Bearer Token)**
+- Senhas criptografadas com **BCrypt**
+- Filtro customizado `SecurityFilter` que intercepta e valida o token em cada requisição
+- Sessão **stateless** (sem estado no servidor)
+- Endpoint `/login` público — demais endpoints protegidos
 
 ---
 
-# 🗄 Estrutura do Banco de Dados
+## 📋 Pré-requisitos
 
-A aplicação possui três tabelas principais.
-
-### products
-
-Armazena as informações dos produtos.
-
-Campos principais:
-
-- id
-- product_name
-- color
-- product_size
-- quantity
-- price
-- is_active
+- [Docker](https://www.docker.com/) e Docker Compose instalados
+- Java 17+ *(somente para rodar sem Docker)*
 
 ---
 
-### users
+## ⚙️ Variáveis de Ambiente
 
-Armazena os usuários responsáveis por acessar o sistema.
+Crie um arquivo `.env` na raiz do projeto (ou configure diretamente no `docker-compose.yml`):
 
-Campos:
-
-- id
-- login
-- password
-
----
-
-### inventory_movement
-
-Registra todas as movimentações de estoque.
-
-Campos:
-
-- id
-- product_id
-- type (ENTRY ou EXIT)
-- quantity
-- created_at
-
-Essa tabela mantém um **histórico completo das operações realizadas no estoque**.
+```env
+SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/ecommerce_db
+SPRING_DATASOURCE_USERNAME=root
+SPRING_DATASOURCE_PASSWORD=root
+JWT_SECRET=sua_chave_secreta_aqui
+```
 
 ---
 
-# 🔗 Endpoints Principais
+## 🐳 Como rodar com Docker
 
-## Autenticação
+```bash
+# Subir todos os containers
+docker compose up --build
 
+# Rodar em background
+docker compose up --build -d
+
+# Parar os containers
+docker compose down
+```
+
+📡 Após subir:
+- **API:** `http://localhost:8080`
+- **MySQL:** porta `3307`
+
+---
+
+## 🔑 Autenticação
+
+### 1. Login
+
+```http
 POST /login
+Content-Type: application/json
+```
 
-Realiza login e retorna um token JWT.
+```json
+{
+  "login": "usuario@ecommerce.com",
+  "password": "suasenha"
+}
+```
 
----
+**Resposta:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
 
-## Produtos
+### 2. Usar o token nas demais requisições
 
-POST /products  
-Cria um novo produto.
-
-GET /products  
-Lista produtos ativos com paginação.
-
-GET /products/{id}  
-Busca um produto por ID.
-
-GET /products/name  
-Busca produtos pelo nome.
-
-PUT /products  
-Atualiza um produto.
-
-DELETE /products/{id}  
-Desativa um produto.
+```http
+Authorization: Bearer SEU_TOKEN_AQUI
+```
 
 ---
 
-## Movimentação de Estoque
+## 📌 Endpoints
 
-POST /movement/entry  
-Registra entrada de estoque.
+### 🛍️ Produtos
 
-POST /movement/exit  
-Registra saída de estoque.
+| Método | Endpoint | Descrição |
+|---|---|---|
+| `POST` | `/products` | Criar produto |
+| `GET` | `/products` | Listar produtos (paginado) |
+| `GET` | `/products?name=xx` | Buscar produto por nome |
+| `PUT` | `/products/{id}` | Atualizar produto |
+| `DELETE` | `/products/{id}` | Soft delete do produto |
 
----
-
-# ▶ Como Executar o Projeto
-
-### 1 Clonar o repositório
-
-git clone https://github.com/seu-usuario/ecommerce-inventory-api
-
----
-
-### 2 Configurar o banco de dados
-
-Criar um banco MySQL.
-
-Depois configurar no arquivo:
-
-application.properties
-
----
-
-### 3 Configurar o secret do JWT
-
-No application.properties:
-
-api.security.token.secret=seu_secret
+**Criar produto:**
+```http
+POST /products
+Authorization: Bearer SEU_TOKEN
+Content-Type: application/json
+```
+```json
+{
+  "name": "Notebook Dell",
+  "description": "Notebook i7 16GB RAM",
+  "price": 4500.00,
+  "quantity": 10
+}
+```
 
 ---
 
-### 4 Executar o projeto
+### 📊 Estoque
 
-mvn spring-boot:run
+| Método | Endpoint              | Descrição |
+|---|-----------------------|---|
+| `POST` | `/movement/entry`     | Entrada de estoque |
+| `POST` | `/movement/exit`      | Saída de estoque |
 
-A API estará disponível em:
-
-http://localhost:8080
+**Entrada de estoque:**
+```http
+POST /inventory/entry
+Authorization: Bearer SEU_TOKEN
+Content-Type: application/json
+```
+```json
+{
+  "productId": 1,
+  "quantity": 50
+}
+```
 
 ---
 
-# 🚀 Possíveis Melhorias Futuras
+### 📦 Pedidos
 
-Algumas melhorias que podem ser implementadas no projeto:
+| Método | Endpoint | Descrição |
+|---|---|---|
+| `POST` | `/orders` | Criar pedido |
+| `GET` | `/orders` | Listar pedidos |
+| `GET` | `/orders/{id}` | Buscar pedido por ID |
 
-- documentação da API com **Swagger**
-- testes automatizados
-- controle de usuários e permissões
-- dashboard de estoque
-- integração com frontend
-- relatórios de movimentação de estoque
+**Criar pedido:**
+```http
+POST /orders
+Authorization: Bearer SEU_TOKEN
+Content-Type: application/json
+```
+```json
+{
+  "customerName": "Tiago Silva",
+  "items": [
+    {
+      "productId": 1,
+      "quantity": 2
+    },
+    {
+      "productId": 3,
+      "quantity": 1
+    }
+  ]
+}
+```
+
+**Resposta:**
+```json
+{
+  "id": 1,
+  "customerName": "Tiago Silva",
+  "totalValue": 9500.00,
+  "items": [...]
+}
+```
 
 ---
 
-# 👨‍💻 Autor
+## ⚠️ Regras de Negócio
 
-Tiago Silva
+- ❌ Não permite estoque negativo
+- ❌ Pedido não é criado se não houver estoque suficiente
+- ✅ Baixa automática no estoque após criação de pedido
+- ✅ Cálculo automático do valor total do pedido
+- ✅ Soft delete em produtos (não remove do banco)
+- ✅ Validações com Bean Validation (`@Valid`)
 
-Desenvolvedor backend focado em **Java e Spring Boot**, interessado em construir aplicações robustas e escaláveis.
+---
+
+## 🧪 Testes
+
+Testes unitários implementados com **JUnit + Mockito** para as camadas de serviço:
+
+```bash
+# Rodar os testes
+./mvnw test
+```
+
+Cobertura:
+- `ProductService`
+- `InventoryMovementService`
+- `OrderService`
+
+---
+
+## 🗂️ Migrations (Flyway)
+
+O banco é versionado via Flyway. As migrations rodam automaticamente ao subir a aplicação, criando todas as tabelas necessárias.
+
+---
+
+## 🚀 Possíveis Melhorias
+
+- [ ] Controle de roles (ADMIN / USER)
+- [ ] Paginação em pedidos
+- [ ] Logs estruturados (ex: Logback + ELK)
+- [ ] Swagger / OpenAPI para documentação interativa
+- [ ] Deploy em cloud (AWS / Render / Railway)
+- [ ] Testes de integração
+- [ ] Rate limiting
+
+---
+
+## 🎯 Objetivo do Projeto
+
+Demonstrar domínio em:
+
+- Desenvolvimento backend com **Java**
+- Construção de **APIs REST**
+- **Segurança** com JWT e Spring Security
+- **Modelagem de domínio** e relacionamentos JPA
+- Boas práticas: **Clean Code, SOLID, separação de camadas**
+- **Containerização** com Docker
+- **Versionamento de banco** com Flyway
+- **Testes unitários** com JUnit e Mockito
+
+---
+
+## 👨‍💻 Autor
+
+**Tiago Silva**  
+[GitHub](https://github.com/tiagosilva06) • [LinkedIn](https://linkedin.com/in/tiago-silvadev)
