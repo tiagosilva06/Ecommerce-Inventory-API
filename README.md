@@ -1,98 +1,121 @@
 # 📦 Ecommerce Inventory API
 
-API REST desenvolvida em **Java com Spring Boot** para gestão completa de estoque e pedidos em um cenário de e-commerce real.
+A REST API built with **Java and Spring Boot** for complete inventory and order management in a real e-commerce scenario.
 
-O sistema integra produtos, movimentações de estoque e pedidos com controle automático de quantidade, autenticação JWT e containerização com Docker.
+The system integrates products, inventory movements, and orders with automatic quantity control, JWT authentication, and Docker containerization.
 
 ---
 
-## 🚀 Tecnologias
+## 📋 Table of Contents
 
-| Tecnologia | Versão | Uso |
+- [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
+- [Security](#security)
+- [Getting Started](#getting-started)
+    - [Prerequisites](#prerequisites)
+    - [Environment Variables](#environment-variables)
+    - [Running with Docker](#running-with-docker)
+- [API Documentation](#api-documentation)
+    - [Authentication](#authentication)
+    - [Products](#products)
+    - [Inventory](#inventory)
+    - [Orders](#orders)
+- [Business Rules](#business-rules)
+- [Tests](#tests)
+- [Database Migrations](#database-migrations)
+- [Possible Improvements](#possible-improvements)
+- [Project Goals](#project-goals)
+- [Author](#author)
+
+---
+
+## Tech Stack
+
+| Technology | Version | Purpose |
 |---|---|---|
-| Java | 17 | Linguagem principal |
-| Spring Boot | 3.x | Framework base |
-| Spring Security | 6.x | Autenticação e autorização |
-| Spring Data JPA | 3.x | Persistência de dados |
-| MySQL | 8 | Banco de dados relacional |
-| Flyway | - | Migrations de banco |
-| Docker & Docker Compose | - | Containerização |
-| JWT (auth0) | - | Tokens de autenticação |
-| BCrypt | - | Hash de senhas |
-| JUnit + Mockito | - | Testes unitários |
+| Java | 17 | Main language |
+| Spring Boot | 3.x | Base framework |
+| Spring Security | 6.x | Authentication and authorization |
+| Spring Data JPA | 3.x | Data persistence |
+| MySQL | 8 | Relational database |
+| Flyway | - | Database migrations |
+| Docker & Docker Compose | - | Containerization |
+| JWT (auth0) | - | Authentication tokens |
+| BCrypt | - | Password hashing |
+| JUnit + Mockito | - | Unit testing |
 
 ---
 
-## 🧠 Arquitetura
+## Architecture
 
-O projeto segue arquitetura em camadas com separação clara de responsabilidades:
+The project follows a layered architecture with clear separation of concerns:
 
 ```
 src/
-├── controller/       → Entrada HTTP, validação de request
-├── service/          → Regras de negócio
-├── repository/       → Acesso a dados (Spring Data JPA)
-├── entity/           → Modelagem do domínio
-├── dto/              → Objetos de transferência de dados
+├── controller/       → HTTP entry point, request validation
+├── service/          → Business rules
+├── repository/       → Data access (Spring Data JPA)
+├── entity/           → Domain modeling
+├── dto/              → Data Transfer Objects
 ├── config/
-│   └── security/     → Configuração do Spring Security + Filtro JWT
-└── migrations/       → Scripts Flyway
+│   └── security/     → Spring Security config + JWT filter
+└── migrations/       → Flyway scripts
 ```
 
 ---
 
-## 🔐 Segurança
+## Security
 
-- Autenticação via **JWT (Bearer Token)**
-- Senhas criptografadas com **BCrypt**
-- Filtro customizado `SecurityFilter` que intercepta e valida o token em cada requisição
-- Sessão **stateless** (sem estado no servidor)
-- Endpoint `/login` público — demais endpoints protegidos
-
----
-
-## 📋 Pré-requisitos
-
-- [Docker](https://www.docker.com/) e Docker Compose instalados
-- Java 17+ *(somente para rodar sem Docker)*
+- Authentication via **JWT (Bearer Token)**
+- Passwords encrypted with **BCrypt**
+- Custom `SecurityFilter` that intercepts and validates the token on every request
+- **Stateless** session — no server-side state
+- `/login` endpoint is public — all other endpoints are protected
 
 ---
 
-## ⚙️ Variáveis de Ambiente
+## Getting Started
 
-Crie um arquivo `.env` na raiz do projeto (ou configure diretamente no `docker-compose.yml`):
+### Prerequisites
+
+- [Docker](https://www.docker.com/) and Docker Compose installed
+- Java 17+ *(only required to run without Docker)*
+
+### Environment Variables
+
+Create a `.env` file in the project root (or configure directly in `docker-compose.yml`):
 
 ```env
 SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/ecommerce_db
 SPRING_DATASOURCE_USERNAME=root
 SPRING_DATASOURCE_PASSWORD=root
-JWT_SECRET=sua_chave_secreta_aqui
+JWT_SECRET=your_secret_key_here
 ```
 
----
-
-## 🐳 Como rodar com Docker
+### Running with Docker
 
 ```bash
-# Subir todos os containers
+# Start all containers
 docker compose up --build
 
-# Rodar em background
+# Run in background
 docker compose up --build -d
 
-# Parar os containers
+# Stop containers
 docker compose down
 ```
 
-📡 Após subir:
+After startup:
 - **API:** `http://localhost:8080`
-- **MySQL:** porta `3307`
+- **MySQL:** port `3307`
 
 ---
 
-## 🔑 Autenticação
+## API Documentation
 
-### 1. Login
+### Authentication
+
+#### 1. Login
 
 ```http
 POST /login
@@ -101,47 +124,40 @@ Content-Type: application/json
 
 ```json
 {
-  "login": "usuario@ecommerce.com",
-  "password": "suasenha"
+  "login": "user@ecommerce.com",
+  "password": "yourpassword"
 }
 ```
 
-**Resposta:**
+**Response:**
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 }
 ```
 
-### 2. Usar o token nas demais requisições
+#### 2. Using the token
 
 ```http
-Authorization: Bearer SEU_TOKEN_AQUI
+Authorization: Bearer YOUR_TOKEN_HERE
 ```
 
 ---
 
-## 📌 Endpoints
+### Products
 
-### 🛍️ Produtos
+| Method | Endpoint | Description | Auth Required |
+|---|---|---|---|
+| `POST` | `/products` | Create product | ✅ Yes |
+| `GET` | `/products` | List products (paginated) | ✅ Yes |
+| `GET` | `/products?name=xx` | Search product by name | ✅ Yes |
+| `PUT` | `/products/{id}` | Update product | ✅ Yes |
+| `DELETE` | `/products/{id}` | Soft delete product | ✅ Yes |
 
-| Método | Endpoint | Descrição |
-|---|---|---|
-| `POST` | `/products` | Criar produto |
-| `GET` | `/products` | Listar produtos (paginado) |
-| `GET` | `/products?name=xx` | Buscar produto por nome |
-| `PUT` | `/products/{id}` | Atualizar produto |
-| `DELETE` | `/products/{id}` | Soft delete do produto |
-
-**Criar produto:**
-```http
-POST /products
-Authorization: Bearer SEU_TOKEN
-Content-Type: application/json
-```
+**Create product example:**
 ```json
 {
-  "name": "Notebook Dell",
+  "name": "Dell Notebook",
   "description": "Notebook i7 16GB RAM",
   "price": 4500.00,
   "quantity": 10
@@ -150,19 +166,14 @@ Content-Type: application/json
 
 ---
 
-### 📊 Estoque
+### Inventory
 
-| Método | Endpoint              | Descrição |
-|---|-----------------------|---|
-| `POST` | `/movement/entry`     | Entrada de estoque |
-| `POST` | `/movement/exit`      | Saída de estoque |
+| Method | Endpoint | Description | Auth Required |
+|---|---|---|---|
+| `POST` | `/movement/entry` | Stock entry | ✅ Yes |
+| `POST` | `/movement/exit` | Stock exit | ✅ Yes |
 
-**Entrada de estoque:**
-```http
-POST /inventory/entry
-Authorization: Bearer SEU_TOKEN
-Content-Type: application/json
-```
+**Stock entry example:**
 ```json
 {
   "productId": 1,
@@ -172,20 +183,15 @@ Content-Type: application/json
 
 ---
 
-### 📦 Pedidos
+### Orders
 
-| Método | Endpoint | Descrição |
-|---|---|---|
-| `POST` | `/orders` | Criar pedido |
-| `GET` | `/orders` | Listar pedidos |
-| `GET` | `/orders/{id}` | Buscar pedido por ID |
+| Method | Endpoint | Description | Auth Required |
+|---|---|---|---|
+| `POST` | `/orders` | Create order | ✅ Yes |
+| `GET` | `/orders` | List orders | ✅ Yes |
+| `GET` | `/orders/{id}` | Get order by ID | ✅ Yes |
 
-**Criar pedido:**
-```http
-POST /orders
-Authorization: Bearer SEU_TOKEN
-Content-Type: application/json
-```
+**Create order example:**
 ```json
 {
   "customerName": "Tiago Silva",
@@ -202,7 +208,7 @@ Content-Type: application/json
 }
 ```
 
-**Resposta:**
+**Response:**
 ```json
 {
   "id": 1,
@@ -214,67 +220,67 @@ Content-Type: application/json
 
 ---
 
-## ⚠️ Regras de Negócio
+## Business Rules
 
-- ❌ Não permite estoque negativo
-- ❌ Pedido não é criado se não houver estoque suficiente
-- ✅ Baixa automática no estoque após criação de pedido
-- ✅ Cálculo automático do valor total do pedido
-- ✅ Soft delete em produtos (não remove do banco)
-- ✅ Validações com Bean Validation (`@Valid`)
+- ❌ Negative stock is not allowed
+- ❌ Orders are rejected if there is insufficient stock
+- ✅ Automatic stock deduction after order creation
+- ✅ Automatic total order value calculation
+- ✅ Soft delete on products — records are not removed from the database
+- ✅ Input validation with Bean Validation (`@Valid`)
 
 ---
 
-## 🧪 Testes
+## Tests
 
-Testes unitários implementados com **JUnit + Mockito** para as camadas de serviço:
+Unit tests implemented with **JUnit + Mockito** for the service layer:
 
 ```bash
-# Rodar os testes
+# Run tests
 ./mvnw test
 ```
 
-Cobertura:
+Coverage:
 - `ProductService`
 - `InventoryMovementService`
 - `OrderService`
 
 ---
 
-## 🗂️ Migrations (Flyway)
+## Database Migrations
 
-O banco é versionado via Flyway. As migrations rodam automaticamente ao subir a aplicação, criando todas as tabelas necessárias.
+The database is versioned with Flyway. Migrations run automatically on application startup, creating all necessary tables.
 
 ---
 
-## 🚀 Possíveis Melhorias
+## Possible Improvements
 
-- [ ] Controle de roles (ADMIN / USER)
-- [ ] Paginação em pedidos
-- [ ] Logs estruturados (ex: Logback + ELK)
-- [ ] Swagger / OpenAPI para documentação interativa
-- [ ] Deploy em cloud (AWS / Render / Railway)
-- [ ] Testes de integração
+- [ ] Role-based access control (ADMIN / USER)
+- [ ] Pagination for orders
+- [ ] Structured logging (e.g. Logback + ELK)
+- [ ] Swagger / OpenAPI interactive documentation
+- [ ] Cloud deployment (AWS / Render / Railway)
+- [ ] Integration tests
 - [ ] Rate limiting
 
 ---
 
-## 🎯 Objetivo do Projeto
+## Project Goals
 
-Demonstrar domínio em:
+This project demonstrates proficiency in:
 
-- Desenvolvimento backend com **Java**
-- Construção de **APIs REST**
-- **Segurança** com JWT e Spring Security
-- **Modelagem de domínio** e relacionamentos JPA
-- Boas práticas: **Clean Code, SOLID, separação de camadas**
-- **Containerização** com Docker
-- **Versionamento de banco** com Flyway
-- **Testes unitários** com JUnit e Mockito
+- Backend development with **Java**
+- Building **REST APIs**
+- **Security** with JWT and Spring Security
+- **Domain modeling** and JPA relationships
+- Best practices: **Clean Code, SOLID, layered architecture**
+- **Containerization** with Docker
+- **Database versioning** with Flyway
+- **Unit testing** with JUnit and Mockito
 
 ---
 
-## 👨‍💻 Autor
+## Author
 
-**Tiago Silva**  
+**Tiago Silva**
 [GitHub](https://github.com/tiagosilva06) • [LinkedIn](https://linkedin.com/in/tiago-silvadev)
